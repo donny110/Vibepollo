@@ -97,8 +97,13 @@ namespace system_tray {
   }
 
   void tray_open_ui_cb([[maybe_unused]] struct tray_menu *item) {
-    BOOST_LOG(info) << "Opening UI from system tray"sv;
-    launch_ui();
+    BOOST_LOG(info) << "Opening V2 UI from system tray"sv;
+    launch_ui("/v2/");
+  }
+
+  void tray_open_legacy_ui_cb([[maybe_unused]] struct tray_menu *item) {
+    BOOST_LOG(info) << "Opening legacy UI from system tray"sv;
+    launch_ui("/");
   }
 
   void
@@ -139,6 +144,7 @@ namespace system_tray {
       (struct tray_menu[]) {
         // todo - use boost/locale to translate menu strings
         {.text = "Open Vibepollo", .cb = tray_open_ui_cb},
+        {.text = "Open legacy UI", .cb = tray_open_legacy_ui_cb},
         {.text = "-"},
         // { .text = "-" },
         // { .text = "Donate",
