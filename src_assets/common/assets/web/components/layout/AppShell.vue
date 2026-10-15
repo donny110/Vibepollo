@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 
 import { UiIcon } from '@/components/ui';
+import { apiPatch } from '@/api/client';
 import { useSystemStore } from '@/stores/system';
 import UpdateNotice from './UpdateNotice.vue';
 
@@ -64,6 +65,17 @@ const statusIcon = computed(() => {
   if (system.health === 'streaming') return 'activity';
   return 'check-circle';
 });
+
+async function selectLegacyWebUi(event: MouseEvent): Promise<void> {
+  if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+  event.preventDefault();
+  try {
+    await apiPatch('/api/config', { web_ui_preference: 'legacy' });
+  } catch (error) {
+    console.warn('Could not save the legacy web UI preference:', error);
+  }
+  window.location.assign('/');
+}
 
 function isCurrent(path: string): boolean {
   if (path === '/') return route.path === '/';
@@ -260,7 +272,7 @@ onBeforeUnmount(() => {
             </button>
           </div>
         </div>
-        <a class="sidebar__legacy" href="/" :title="t('ui.shell.classic_interface')">
+        <a class="sidebar__legacy" href="/" :title="t('ui.shell.classic_interface')" @click="selectLegacyWebUi">
           <UiIcon name="external-link" :size="16" />
           <span class="sidebar__label">{{ t('ui.shell.classic_interface') }}</span>
         </a>
