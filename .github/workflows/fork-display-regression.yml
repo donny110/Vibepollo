@@ -1,0 +1,34 @@
+name: Fork Windows display regression
+permissions: {}
+
+on:
+  push:
+    branches:
+      - ci/devices-layout-validation
+  workflow_dispatch:
+
+concurrency:
+  group: fork-display-regression-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    name: Build and run Windows regression tests
+    permissions:
+      actions: read
+      contents: read
+    uses: ./.github/workflows/ci-windows.yml
+    with:
+      use_self_hosted: false
+      build_only: true
+      build_tests: true
+      daily_unsigned: false
+      release_commit: ${{ github.sha }}
+      release_version: 2.0.2
+      symbol_product_name: Vibepollo
+      symbol_release_prefix: polo
+      publish_symbols: false
+      upload_symbols_artifact: false
+      require_signpath_signing: false
+      require_truehdr_runtime: false
+      release_artifact_retention_days: 3
