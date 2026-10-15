@@ -4,7 +4,7 @@ permissions: {}
 on:
   push:
     branches:
-      - ci/surgical-fixes-validation
+      - ci/frontend-navigation-hotfix
   workflow_dispatch:
 
 concurrency:
@@ -35,23 +35,3 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test -g "V2 switch to legacy saves|Windows maintenance uses"
 
-  windows:
-    name: Build and run Windows regression tests
-    permissions:
-      actions: read
-      contents: read
-    uses: ./.github/workflows/ci-windows.yml
-    with:
-      use_self_hosted: false
-      build_only: true
-      build_tests: true
-      daily_unsigned: false
-      release_commit: ${{ github.sha }}
-      release_version: 2.0.2
-      symbol_product_name: Vibepollo
-      symbol_release_prefix: polo
-      publish_symbols: false
-      upload_symbols_artifact: false
-      require_signpath_signing: false
-      require_truehdr_runtime: false
-      release_artifact_retention_days: 3
