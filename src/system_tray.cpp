@@ -97,13 +97,9 @@ namespace system_tray {
   }
 
   void tray_open_ui_cb([[maybe_unused]] struct tray_menu *item) {
-    BOOST_LOG(info) << "Opening V2 UI from system tray"sv;
-    launch_ui("/v2/");
-  }
-
-  void tray_open_legacy_ui_cb([[maybe_unused]] struct tray_menu *item) {
-    BOOST_LOG(info) << "Opening legacy UI from system tray"sv;
-    launch_ui("/");
+    const bool use_v2 = config::sunshine.web_ui_preference == "v2";
+    BOOST_LOG(info) << "Opening " << (use_v2 ? "V2" : "legacy") << " UI from system tray"sv;
+    launch_ui(use_v2 ? "/v2/" : "/");
   }
 
   void
@@ -144,7 +140,6 @@ namespace system_tray {
       (struct tray_menu[]) {
         // todo - use boost/locale to translate menu strings
         {.text = "Open Vibepollo", .cb = tray_open_ui_cb},
-        {.text = "Open legacy UI", .cb = tray_open_legacy_ui_cb},
         {.text = "-"},
         // { .text = "-" },
         // { .text = "Donate",
