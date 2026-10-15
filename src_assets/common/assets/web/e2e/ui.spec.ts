@@ -400,6 +400,11 @@ test('bulk unpair requires a confirmation and calls the existing endpoint', asyn
 
 test('V2 switch to legacy saves the host UI preference before navigating', async ({ page }) => {
   const patches = await host(page, 'windows');
+  // The V2-only Vite dev server has no classic UI shell; supply the legacy landing
+  // page so this test exercises the switch without relying on a second server.
+  await localRoute(page, '**/', async (route) => {
+    await route.fulfill({ status: 200, contentType: 'text/html', body: '<html><body>Classic UI test landing</body></html>' });
+  });
   await page.goto('/v2/');
   const link = page.locator('.sidebar__legacy');
   await expect(link).toHaveAttribute('href', '/');
