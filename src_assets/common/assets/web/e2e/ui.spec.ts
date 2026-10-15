@@ -398,6 +398,27 @@ test('bulk unpair requires a confirmation and calls the existing endpoint', asyn
   await expect.poll(() => calls).toBe(1);
 });
 
+test('V2 switch to legacy saves the host UI preference before navigating', async ({ page }) => {
+  const patches = await host(page, 'windows');
+  await page.goto('/v2/');
+  const link = page.locator('.sidebar__legacy');
+  await expect(link).toHaveAttribute('href', '/');
+  await link.click();
+  await expect.poll(() => patches.find((patch) => patch.web_ui_preference === 'legacy')).toBeTruthy();
+  await expect.poll(() => new URL(page.url()).pathname).toBe('/');
+});
+
+test('Windows maintenance uses server-provided log bundle filename', async ({ page }) => {
+  await host(page, 'windows');
+  await page.goto('/v2/maintenance');
+  const link = page.getByRole('link', { name: 'Download logs bundle' });
+  await expect(link).toBeVisible();
+  await expect(link).toHaveAttribute('href', '/api/logs/export');
+  // A bare `download` attribute makes browsers name the file "export"
+  // instead of honoring the timestamped ZIP name in Content-Disposition.
+  await expect(link).not.toHaveAttribute('download');
+});
+
 test('Linux maintenance offers logs and display setup', async ({ page }) => {
   await host(page);
   await page.goto('/v2/maintenance');
