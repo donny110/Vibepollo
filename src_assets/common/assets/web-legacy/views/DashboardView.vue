@@ -567,6 +567,7 @@ import { isCrashDumpEligible, sanitizeCrashDumpStatus } from '@/utils/crashDump'
 import { toIntlLocale } from '@/utils/intlLocale';
 
 async function selectV2WebUi(event: MouseEvent): Promise<void> {
+  if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
   event.preventDefault();
   try {
     await http.patch('/api/config', { web_ui_preference: 'v2' });
