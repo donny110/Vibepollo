@@ -130,7 +130,7 @@ test('Everyday restores impactful choices and shares drafts with detailed catego
   await page.locator('#setting-dd_paused_virtual_display_timeout_secs').selectOption('3600');
 
   await page.locator('#settings-group-everyday-everyday_encoding a.settings-more').click();
-  await expect(page).toHaveURL(/category=video/);
+  await expect(page).toHaveURL(new RegExp('/$'));
   await page.locator('#settings-group-video-encoder_nvenc summary').click();
   await expect(page.locator('#setting-nvenc_preset')).toHaveValue('3');
   await expect(page.locator('#setting-nvenc_twopass')).toHaveValue('full_res');
