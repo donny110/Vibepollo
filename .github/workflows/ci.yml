@@ -23,7 +23,7 @@ on:
         default: false
   push:
     branches:
-      - '**'
+      - master
     tags:
       - '*'
   pull_request:
