@@ -402,7 +402,8 @@ test('V2 switch to legacy saves the host UI preference before navigating', async
   const patches = await host(page, 'windows');
   // The V2-only Vite dev server has no classic UI shell; supply the legacy landing
   // page so this test exercises the switch without relying on a second server.
-  await localRoute(page, '**/', async (route) => {
+  // Intercept only the legacy root; '**/' also matched /v2/ and hid AppShell.
+  await page.route('http://127.0.0.1:5173/', async (route) => {
     await route.fulfill({ status: 200, contentType: 'text/html', body: '<html><body>Classic UI test landing</body></html>' });
   });
   await page.goto('/v2/');
