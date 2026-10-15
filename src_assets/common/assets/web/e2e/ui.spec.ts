@@ -398,6 +398,16 @@ test('bulk unpair requires a confirmation and calls the existing endpoint', asyn
   await expect.poll(() => calls).toBe(1);
 });
 
+test('V2 switch to legacy saves the host UI preference before navigating', async ({ page }) => {
+  const patches = await host(page, 'windows');
+  await page.goto('/v2/');
+  const link = page.locator('.sidebar__legacy');
+  await expect(link).toHaveAttribute('href', '/');
+  await link.click();
+  await expect.poll(() => patches.find((patch) => patch.web_ui_preference === 'legacy')).toBeTruthy();
+  await expect(page).toHaveURL(/\\/$/);
+});
+
 test('Linux maintenance offers logs and display setup', async ({ page }) => {
   await host(page);
   await page.goto('/v2/maintenance');
