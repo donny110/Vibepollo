@@ -151,6 +151,27 @@ include(CPack)
         run(package)
         check_archive()
         print("PASS: /MD TrueHDR and transitive release CRTs are staged from compiler redist into the actual CPack archive")
+        # Hosted validation builds omit TrueHDR. The ZIP must still be usable,
+        # while explicit required mode must reject missing runtime files.
+        truehdr_files = ("vibeshine_truehdr.dll", "nvngx_truehdr.dll")
+        truehdr_saved = {name: (payload / name).read_bytes() for name in truehdr_files}
+        for name in truehdr_files:
+            (payload / name).unlink()
+        try:
+            run(configure)
+            run(package)
+            with zipfile.ZipFile(archive) as zipped:
+                contents = {name.rsplit("/", 1)[-1] for name in zipped.namelist()}
+                assert all(name not in contents for name in truehdr_files), "Missing optional TrueHDR entered the portable ZIP"
+            run([*configure, "-DSUNSHINE_REQUIRE_TRUEHDR_RUNTIME=ON"])
+            run(package, success=False, contains="Required portable runtime file missing: vibeshine_truehdr.dll")
+        finally:
+            for name, data in truehdr_saved.items():
+                (payload / name).write_bytes(data)
+            run([*configure, "-DSUNSHINE_REQUIRE_TRUEHDR_RUNTIME=OFF"])
+        run(package)
+        check_archive()
+        print("PASS: optional TrueHDR absence permits ZIP packaging; required mode rejects missing DLLs")
         # The NVIDIA driver supplies nvcuda.dll on GPU hosts. It is absent on
         # CPU-only builders and must not be bundled. A different missing DLL
         # must still fail the same real CPack dependency-closure hook.
