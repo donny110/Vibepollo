@@ -8,7 +8,15 @@ foreach(_portable_target IN ITEMS playnite-launcher sunshine_wgc_capture sunshin
 endforeach()
 
 set(SUNSHINE_PORTABLE_LIBRARIES tools/vibepollo_dualsense_audio.dll)
-set(_portable_runtime_files "${ZLIB}" ${SUNSHINE_TRUEHDR_RUNTIME_FILES})
+# TrueHDR is optional unless SUNSHINE_REQUIRE_TRUEHDR_RUNTIME is enabled.
+# Match the optional MSI install rule: absent DLLs must not become required
+# portable entries when a validation build deliberately omits the runtime.
+set(_portable_runtime_files "${ZLIB}")
+foreach(_truehdr_runtime_file IN LISTS SUNSHINE_TRUEHDR_RUNTIME_FILES)
+    if(SUNSHINE_REQUIRE_TRUEHDR_RUNTIME OR EXISTS "${_truehdr_runtime_file}")
+        list(APPEND _portable_runtime_files "${_truehdr_runtime_file}")
+    endif()
+endforeach()
 if(WEBRTC_RUNTIME_DLL)
     list(APPEND _portable_runtime_files "${WEBRTC_RUNTIME_DLL}")
 endif()
