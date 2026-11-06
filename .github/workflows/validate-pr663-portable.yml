@@ -1,0 +1,30 @@
+name: Validate PR663 portable packaging fix
+permissions: {}
+
+on:
+  push:
+    branches:
+      - validation/pr663-truehdr-portable-20261106
+
+concurrency:
+  group: pr663-portable-validation
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    name: Windows build, tests and portable ZIP
+    permissions:
+      actions: read
+      contents: read
+    uses: ./.github/workflows/ci-windows.yml
+    with:
+      use_self_hosted: false
+      build_only: true
+      build_tests: true
+      daily_unsigned: false
+      release_commit: ${{ github.sha }}
+      release_version: '2.0.1'
+      symbol_product_name: Vibepollo
+      symbol_release_prefix: polo
+      release_artifact_retention_days: 14
+      require_truehdr_runtime: false
